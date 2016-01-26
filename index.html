@@ -23,6 +23,16 @@
        document.body.appendChild(canvas);
        var c = canvas.getContext('2d');
 
+       function Point(x, y){
+          this.x = x;
+          this.ix = x;
+          this.vx = 0;
+          this.y = y;
+          this.iy = y;
+          this.vy = 0;
+       }
+
+
        Waves.init = function(){
            var w = window.innerWidth;
            var h = window.innerHeight;
@@ -32,17 +42,33 @@
            canvas.style.width = w + 'px';
            canvas.style.height = h + 'px';
 
+           points = [];
+           totalPoints = Math.max(Math.round(w / 50), 10);
+           for(i = totalPoints; i>0; i--){
+              points.push(new Point(i/(totalPoints - 3), 0.5));
+           }
 
+           // console.log(points);
 
            update();
        }
 
        function update(){
            updateID = requestAnimationFrame(update);
+
+           var p = points[totalPoints - 1];
+           var cx;
+           var cy;
            c.clearRect(0,0, canvas.width, canvas.height);
            c.fillStyle = Waves.color;
            c.beginPath();
-           c.moveTo(0, 100);
+           c.moveTo(p.x * canvas.width, p.y * canvas.height);
+
+
+
+
+
+           
            c.lineTo(canvas.width, canvas.height);
            c.lineTo(0,canvas.height);
            c.closePath();

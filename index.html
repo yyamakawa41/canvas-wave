@@ -49,9 +49,6 @@
            c.fill();
        }
 
-
-   }(Waves));
-
   function getColor(){
     var options = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
     var newColor = '#';
@@ -68,6 +65,9 @@
   }
 
   canvas.addEventListener('mousedown', Waves.changeColors)
+
+   }(Waves));
+
 
    window.onload = function(){
        Waves.init();

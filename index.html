@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title></title>
+</head>
+<body>
+
+</body>
+
+<script type="text/javascript">
+       var Waves = {};
+   (function (Waves) {
+       var i= 0;
+       var lastTime = 0;
+       var mouseX = 0;
+       var mouseY = -100;
+       var scale = 1;
+       var motion = 1;
+       var updateID;
+       var points;
+       Waves.color = '#0000ff  ';
+       var canvas = document.createElement('canvas');
+       document.body.appendChild(canvas);
+       var c = canvas.getContext('2d');
+
+       Waves.init = function(){
+           var w = window.innerWidth;
+           var h = window.innerHeight;
+           canvas.width = w;
+           canvas.height = h;
+           //Max browser compatability
+           canvas.style.width = w + 'px';
+           canvas.style.height = h + 'px';
+
+
+
+           update();
+       }
+
+       function update(){
+           updateID = requestAnimationFrame(update);
+           c.clearRect(0,0, canvas.width, canvas.height);
+           c.fillStyle = Waves.color;
+           c.beginPath();
+           c.moveTo(0, 100);
+           c.lineTo(canvas.width, canvas.height);
+           c.lineTo(0,canvas.height);
+           c.closePath();
+           c.fill();
+       }
+
+
+   }(Waves));
+
+   window.onload = function(){
+       Waves.init();
+   }
+
+
+</script>
+
+
+</html>

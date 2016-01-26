@@ -64,7 +64,8 @@
     document.body.style.backgroundColor = getColor();
   }
 
-  canvas.addEventListener('mousedown', Waves.changeColors)
+  canvas.addEventListener('mousedown', Waves.changeColors);
+  canvas.addEventListener('mouseup', Waves.changeColors);
 
    }(Waves));
 

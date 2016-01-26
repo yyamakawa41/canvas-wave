@@ -52,6 +52,23 @@
 
    }(Waves));
 
+  function getColor(){
+    var options = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
+    var newColor = '#';
+    for(i=0; i<6;i++){
+      var rand = Math.floor(Math.random() * options.length);
+      newColor += options[rand];
+    }
+    return newColor;
+  }
+
+  Waves.changeColors = function(){
+    Waves.color = getColor();
+    document.body.style.backgroundColor = getColor();
+  }
+
+  canvas.addEventListener('mousedown', Waves.changeColors)
+
    window.onload = function(){
        Waves.init();
    }

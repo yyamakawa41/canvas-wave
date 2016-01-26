@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <title></title>
+ <title>Waves</title>
 </head>
 <body>
 
 </body>
 
 <script type="text/javascript">
-       var Waves = {};
-   (function (Waves) {
-       var i= 0;
-       var lastTime = 0;
-       var mouseX = 0;
-       var mouseY = -100;
-       var scale = 1;
-       var motion = 1;
-       var updateID;
-       var points;
-       Waves.color = '#0000ff  ';
-       var canvas = document.createElement('canvas');
-       document.body.appendChild(canvas);
-       var c = canvas.getContext('2d');
+ var Waves = {};
+ (function (Waves) {
+   var i= 0;
+   var lastTime = 0;
+   var mouseX = 0;
+   var mouseY = -100;
+   var scale = 1;
+   var motion = 1;
+   var updateID;
+   var points;
+   Waves.viscosity = 30;
+   Waves.damping = 0.1;
+   Waves.mouseDist = 200;
+   Waves.color = '#0000ff  ';
+   var canvas = document.createElement('canvas');
+   document.body.appendChild(canvas);
+   var c = canvas.getContext('2d');
 
-       function Point(x, y){
-          this.x = x;
-          this.ix = x;
-          this.vx = 0;
-          this.y = y;
-          this.iy = y;
-          this.vy = 0;
-       }
+   function Point(x, y){
+    this.x = x;
+    this.ix = x;
+    this.vx = 0;
+    this.y = y;
+    this.iy = y;
+    this.vy = 0;
+  }
 
 
-       Waves.init = function(){
-           var w = window.innerWidth;
-           var h = window.innerHeight;
-           canvas.width = w;
-           canvas.height = h;
+  Waves.init = function(){
+   var w = window.innerWidth;
+   var h = window.innerHeight;
+   canvas.width = w;
+   canvas.height = h;
            //Max browser compatability
            canvas.style.width = w + 'px';
            canvas.style.height = h + 'px';
@@ -45,60 +48,97 @@
            points = [];
            totalPoints = Math.max(Math.round(w / 50), 10);
            for(i = totalPoints; i>0; i--){
-              points.push(new Point(i/(totalPoints - 3), 0.5));
-           }
+            points.push(new Point(i/(totalPoints - 3), 0.5));
+          }
 
            // console.log(points);
 
            update();
-       }
+         }
 
-       function update(){
-           updateID = requestAnimationFrame(update);
+         function update(){
+          updateID = requestAnimationFrame(update);
 
-           var p = points[totalPoints - 1];
-           var cx;
-           var cy;
-           c.clearRect(0,0, canvas.width, canvas.height);
-           c.fillStyle = Waves.color;
-           c.beginPath();
-           c.moveTo(p.x * canvas.width, p.y * canvas.height);
+          var p = points[totalPoints - 1];
+          var cx;
+          var cy;
+          c.clearRect(0,0, canvas.width, canvas.height);
+          c.fillStyle = Waves.color;
+          c.beginPath();
+          c.moveTo(p.x * canvas.width, p.y * canvas.height);
 
+          for (var i = totalPoints - 1; i > 0; i--) {
+            p = points[i];
+            p.move();
+            motion += Math.abs(p.vx) + Math.abs(p.vy);
+            cx = (p.x + points[i - 1].x) / 2 * canvas.width;
+            cy = (p.y + points[i - 1].y) / 2 * canvas.height;
+            if (i === 1) {
+              cx = canvas.width;
+            } else if (i === totalPoints - 1) {
+              p.x = 0;
+            }
+            c.bezierCurveTo(p.x * canvas.width, p.y * canvas.height, cx, cy, cx, cy);
+          }
 
-
-
-
-           
-           c.lineTo(canvas.width, canvas.height);
-           c.lineTo(0,canvas.height);
-           c.closePath();
-           c.fill();
-       }
-
-  function getColor(){
-    var options = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
-    var newColor = '#';
-    for(i=0; i<6;i++){
-      var rand = Math.floor(Math.random() * options.length);
-      newColor += options[rand];
-    }
-    return newColor;
-  }
-
-  Waves.changeColors = function(){
-    Waves.color = getColor();
-    document.body.style.backgroundColor = getColor();
-  }
-
-  canvas.addEventListener('mousedown', Waves.changeColors);
-  canvas.addEventListener('mouseup', Waves.changeColors);
-
-   }(Waves));
+          c.lineTo(canvas.width, canvas.height);
+          c.lineTo(0,canvas.height);
+          c.closePath();
+          c.fill();
+        }
 
 
-   window.onload = function(){
-       Waves.init();
-   }
+        Point.prototype.move = function() {
+         var w = canvas.width / scale;
+         var h = canvas.height / scale;
+         this.vx += (this.ix - this.x) / Waves.viscosity * w;
+         this.vy += (this.iy - this.y) / Waves.viscosity * h;
+         var dx = this.x * w - mouseX / scale,
+         dy = this.y * h - mouseY / scale;
+         if (Math.sqrt(dx * dx + dy * dy) < Waves.mouseDist) {
+           var a = Math.atan2(dy, dx);
+           this.vx += (Math.cos(a) * Waves.viscosity - dx) / Waves.viscosity;
+           this.vy -= (Math.sin(a) * Waves.viscosity - dy) / Waves.viscosity;
+         }
+         this.vx *= (1 - Waves.damping);
+         this.vy *= (1 - Waves.damping);
+         this.x += this.vx / w;
+         this.y += this.vy / h;
+         if (this.y < 0) {
+           this.y = 0;
+         } else if (this.y > 1) {
+           this.y = 1;
+         }
+       };
+
+       function getColor(){
+        var options = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
+        var newColor = '#';
+        for(i=0; i<6;i++){
+          var rand = Math.floor(Math.random() * options.length);
+          newColor += options[rand];
+        }
+        return newColor;
+      }
+
+      Waves.changeColors = function(){
+        Waves.color = getColor();
+        document.body.style.backgroundColor = getColor();
+      }
+
+      canvas.addEventListener('mousedown', Waves.changeColors);
+      canvas.addEventListener('mouseup', Waves.changeColors);
+      canvas.addEventListener('mousemove', function(event){
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+      });
+
+    }(Waves));
+
+
+window.onload = function(){
+ Waves.init();
+}
 
 
 </script>
